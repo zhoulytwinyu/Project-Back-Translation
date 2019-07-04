@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 from flask import Flask, request, jsonify
 from backtranslate import backTranslate
-app = Flask(__name__)
+App = Flask(__name__)
 
-@app.route("/api/backtranslate",methods=["POST"])
+@App.route("/api/backtranslate",methods=["POST"])
 def routeBackTranslate():
   # We require setting Content-Type to application/json
   if "Content-Type" not in request.headers or \
@@ -28,4 +28,4 @@ def routeBackTranslate():
     return jsonify({"error":str(e)}),400
 
 if __name__ == "__main__":
-  app.run(host='0.0.0.0')
+  App.run(host='0.0.0.0',port=3000)
