@@ -4,3 +4,4 @@ env/
 
 # nodejs
 node_modules/
+build/
