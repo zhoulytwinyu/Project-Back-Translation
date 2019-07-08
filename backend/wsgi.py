@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-from app import App
+#!/usr/bin/env python3
+from app import createApplication
 
-if __name__ == "__main__":
-  App.run()
+App = createApplication()

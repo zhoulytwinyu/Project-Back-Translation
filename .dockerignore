@@ -1,0 +1,10 @@
+# Git
+.git/
+.gitignore
+
+# python
+__pycache__
+
+# nodejs
+node_modules
+build
