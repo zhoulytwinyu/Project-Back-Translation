@@ -1,6 +1,6 @@
 # Project-Back-Translation
 
-## Install
+## Install and run
 ```
 git clone https://github.com/zhoulytwinyu/Project-Back-Translation.git
 cd Project-Back-Translation
@@ -8,6 +8,8 @@ PROJECT_NAME="project-back-translation"
 docker build . -t $PROJECT_NAME
 docker run -p 5000:80  -it $PROJECT_NAME
 ```
+
+Now, open your favorite browser and visit `localhost:5000`
 
 ## Accepted input
 A sequence of __capitalized__, __non-degnerative__, __single-letter__ encoding amino acids:
