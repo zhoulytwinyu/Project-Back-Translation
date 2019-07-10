@@ -2,7 +2,8 @@
 
 ## Install
 ```
-git clone
+git clone https://github.com/zhoulytwinyu/Project-Back-Translation.git
+cd Project-Back-Translation
 PROJECT_NAME="project-back-translation"
 docker build . -t $PROJECT_NAME
 docker run -p 5000:80  -it $PROJECT_NAME
