@@ -7,20 +7,20 @@ const INVALID_AMINO_ACID_CODE_REGEX = /[^ARNDCQEGHIMLKFPSTWYV*]/g;
 
 class AminoAcidTextArea extends PureComponent {
   render(){
-    let {AASeqInput,AASeqInfo} = this.props;
+    let {AminoAcidSequence} = this.props;
     return (
       <textarea className="AminoAcidTextArea-textarea"
-                value={AASeqInput}
-                onChange={this.handleUpdateAminoAcidSequence}>
+                value={AminoAcidSequence}
+                onChange={this.handleChange}>
       </textarea>
     );
   }
 
-  handleUpdateAminoAcidSequence = (ev)=>{
-    let {updateAminoAcidSequenceHandler} = this.props;
+  handleChange = (ev)=>{
+    let {changeHandler} = this.props;
     let rawAminoAcidSequence = ev.target.value;
     let validAminoAcidSequence = this.toValidAminoAcidSequence(rawAminoAcidSequence);
-    updateAminoAcidSequenceHandler(validAminoAcidSequence);
+    changeHandler(validAminoAcidSequence);
   };
 
   toValidAminoAcidSequence(rawAminoAcidSequence){
