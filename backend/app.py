@@ -63,7 +63,7 @@ def get_or_create_amino_acid(conn,aa_seq):
   nt_rows = cursor.fetchall()
   ret = {}
   ret["AMINO_ACID"] = dict(aa_row)
-  ret["NUCLEOTIDE_LIST"] = nt_rows
+  ret["NUCLEOTIDE_LIST"] = list( map(dict,nt_rows) )
   return ret
   
 get_or_create_amino_acid.GET_AMINO_ACID_SQL = \
