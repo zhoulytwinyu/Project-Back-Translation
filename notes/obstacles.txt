@@ -1,9 +1,0 @@
-uwsgi config
-Debian package uwsgi differently from alpine linux package uwsgi.
-
-docker
-
-algorithm: July
-
-4 hours drafting the algorithm.
-Tried to separate amino acid into 3 groups, one that can only lower the GC, one that can only increase GC, and one that can adjust GC in both directions.
