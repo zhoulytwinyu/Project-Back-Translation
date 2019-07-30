@@ -1,4 +1,4 @@
 #!/usr/bin/env python3
-from app import createApplication
+from app import create_application
 
-App = createApplication()
+app = create_application()

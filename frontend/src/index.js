@@ -1,9 +1,10 @@
-import React, {Component, PureComponent} from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
 // Components
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ShowAndHideDiv from "./components/ShowAndHideDiv";
 import AminoAcidTextArea from "./components/AminoAcidTextArea";
 import GCFilter from "./components/GCFilter";
 import NucleotideDisplayBox from "./components/NucleotideDisplayBox";
@@ -13,52 +14,18 @@ import 'bootstrap-css-only/css/bootstrap.min.css';
 class App extends Component {
   constructor(props){
     super(props);
-    this.state = {AminoAcidInput: "",
-                  AminoAcidObject: null,
-                  NucleotideObjectList: null,
-                  GCFilterMin: 0,
-                  GCFilterMax: 1,
+    this.state = {aminoAcidInput: "",
+                  aminoAcid: null,
+                  nucleotideList: [],
+                  gcFilterMin: 0,
+                  gcFilterMax: 1,
                   };
   }
 
   render (){
-    let { AminoAcidInput,AminoAcidObject,
-          NucleotideObjectList,
-          GCFilterMin,GCFilterMax} = this.state;
-    let NucleotideDisplay = null;
-    if (AminoAcidObject !== null) {
-      NucleotideDisplay = (
-        <div className="row justify-content-between">
-          <div className="col-sm-3 border p-3">
-            <h2>Filters</h2>
-            <GCFilter AminoAcidObject={AminoAcidObject}
-                      GCFilterMin={GCFilterMin} GCFilterMax={GCFilterMax}
-                      updateGCFilterMinHandler={this.handleGCFilterMinUpdate}
-                      updateGCFilterMaxHandler={this.handleGCFilterMaxUpdate}
-                      />
-          </div>
-          <div className="col-sm-9 border p-3">
-            <button type="button" className="btn btn-primary btn-lg btn-block"
-                    onClick={this.generateAndFetchBackTranslation}>
-              Generate
-            </button>
-            {NucleotideObjectList.map( ({SEQUENCE,GC_CONTENT},i)=>{
-              if (GCFilterMin<=GC_CONTENT && GC_CONTENT<=GCFilterMax){
-                return (
-                  <NucleotideDisplayBox key={i}
-                                        sequence={SEQUENCE}
-                                        GCContent={GC_CONTENT}
-                                        />
-                );
-              }
-              return null;
-              })
-              }
-          </div>
-        </div>
-        );
-      }
-      
+    let { aminoAcidInput,
+          aminoAcid,nucleotideList,
+          gcFilterMin,gcFilterMax} = this.state;
     return (
       <>
         <Header/>
@@ -66,100 +33,119 @@ class App extends Component {
           <div className="row border p-3">
             <div className="col-12">
               <h2>Amino Acid</h2>
-              <AminoAcidTextArea  AminoAcidSequence={AminoAcidInput}
+              <AminoAcidTextArea  aminoAcidSequence={aminoAcidInput}
                                   changeHandler={this.handleAminoAcidInputChange}
                                   />
             </div>
             <div className="col-12">
               <button type="button" className="btn btn-primary btn-lg btn-block"
-                      onClick={this.fetchAminoAcidObject}>
+                      disabled={aminoAcidInput===""}
+                      onClick={this.fetchAminoAcid}>
                 Search
               </button>
             </div>
           </div>
-          {NucleotideDisplay}
+          <ShowAndHideDiv show={aminoAcid!==null &&
+                                aminoAcid["SEQUENCE"]===aminoAcidInput
+                                }>
+            <div className="row justify-content-between">
+              <div className="col-sm-3 border p-3">
+                <h2>Filters</h2>
+                <GCFilter gcMin={aminoAcid?aminoAcid["GC_MIN"]:null}
+                          gcMax={aminoAcid?aminoAcid["GC_MAX"]:null}
+                          gcFilterMin={gcFilterMin}
+                          gcFilterMax={gcFilterMax}
+                          updateGCFilterMinHandler={this.handleGCFilterMinUpdate}
+                          updateGCFilterMaxHandler={this.handleGCFilterMaxUpdate}
+                          />
+              </div>
+              <div className="col-sm-9 border p-3" style={{maxHeight:600}}>
+                <button type="button" className="btn btn-primary btn-lg btn-block"
+                        onClick={this.fetchBackTranslation}>
+                  Generate
+                </button>
+                {nucleotideList.map( ({SEQUENCE,GC_CONTENT},i)=>{
+                    if (gcFilterMin<=GC_CONTENT && GC_CONTENT<=gcFilterMax){
+                      return (
+                        <NucleotideDisplayBox key={i}
+                                              sequence={SEQUENCE}
+                                              gcContent={GC_CONTENT}
+                                              />
+                      );
+                    }
+                    return null;
+                  })
+                }
+              </div>
+            </div>
+          </ShowAndHideDiv>
         </div>
         <Footer/>
       </>
     );
   }
 
-  handleAminoAcidInputChange = (AminoAcidInput)=>{
-    this.setState({AminoAcidInput});
+  handleAminoAcidInputChange = (aminoAcidInput)=>{
+    this.setState({aminoAcidInput});
   }
 
-  handleGCFilterMinUpdate = (GCFilterMin)=>{
-    this.setState({GCFilterMin});
+  handleGCFilterMinUpdate = (gcFilterMin)=>{
+    this.setState({gcFilterMin});
   }
 
-  handleGCFilterMaxUpdate = (GCFilterMax)=>{
-    this.setState({GCFilterMax});
+  handleGCFilterMaxUpdate = (gcFilterMax)=>{
+    this.setState({gcFilterMax});
   }
 
-  fetchAminoAcidObject = ()=>{
-    let {AminoAcidInput} = this.state;
-    new Promise((resolve,reject)=>{
-      setTimeout( ()=>resolve({ AMINO_ACID:{SEQUENCE:"AAA",
-                                            GC_MAX: 0.8,
-                                            GC_MIN: 0.2,
-                                            AA_ID: 0 
-                                            },
-                                NUCLEOTIDE_LIST:[{SEQUENCE: "ATTATTATT",
-                                                  GC_CONTENT: 0.1,
-                                                  NT_ID: 0
-                                                  },
-                                                 {SEQUENCE: "ATTATGATG",
-                                                  GC_CONTENT: 0.8,
-                                                  NT_ID: 1
-                                                  }
-                                                  ]
-                                }),
-                  1000);
-      })
-      .then( jsonObj=>{
-        this.setState({ AminoAcidObject:jsonObj["AMINO_ACID"],
-                        NucleotideObjectList:jsonObj["NUCLEOTIDE_LIST"],
-                        }
-                      );
+  fetchAminoAcid = ()=>{
+    let {aminoAcidInput} = this.state;
+    fetch("/api/aminoacid",
+          { method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({"AMINO_ACID_SEQUENCE":aminoAcidInput})
+          }
+      )
+      .then( resp=>resp.json() )
+      .then( obj=>{
+        let {AMINO_ACID, NUCLEOTIDE_LIST} = obj;
+        let nucleotideList = NUCLEOTIDE_LIST;
+        let aminoAcid = AMINO_ACID;
+        this.setState({ aminoAcid,
+                        nucleotideList
+                        });
       })
   }
 
-  generateAndFetchBackTranslation = ()=>{
-    let {AminoAcidInput} = this.state;
-    new Promise((resolve,reject)=>{
-      setTimeout( ()=>resolve({ 
-                                NUCLEOTIDE_LIST:[{SEQUENCE: "ATTATTATT",
-                                                  GC_CONTENT: 0.1,
-                                                  NT_ID: 0
-                                                  },
-                                                 {SEQUENCE: "ATTATGATG",
-                                                  GC_CONTENT: 0.8,
-                                                  NT_ID: 1
-                                                  },
-                                                 {SEQUENCE: "ATTATCATC",
-                                                  GC_CONTENT: 0.5,
-                                                  NT_ID: 2
-                                                  },
-                                                 {SEQUENCE: "ATAATCATC",
-                                                  GC_CONTENT: 0.45,
-                                                  NT_ID: 3
-                                                  }
-                                                  ]
-                                }),
-                  1000);
-      })
-      .then( jsonObj=>{
-        this.setState({ NucleotideObjectList:jsonObj["NUCLEOTIDE_LIST"]
+  fetchBackTranslation = ()=>{
+    let {aminoAcid,gcFilterMin,gcFilterMax} = this.state;
+    let sequence = aminoAcid["SEQUENCE"];
+    fetch("/api/backtranslate",
+          { method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({"AMINO_ACID_SEQUENCE":sequence,
+                                  "GC_FILTER_MIN":gcFilterMin,
+                                  "GC_FILTER_MAX":gcFilterMax
+                                  })
+          }
+      )
+      .then( resp=>resp.json() )
+      .then( obj=>{
+        let nucleotideList = obj["NUCLEOTIDE_LIST"];
+        this.setState({ nucleotideList
                         }
                       );
       })
   }
 
   setState(obj) {
-    if ("AminoAcidObject" in obj) {
-      let {GCFilterMin,GCFilterMax} = this.state;
-      obj["GCFilterMin"] = Math.max(GCFilterMin,obj["AminoAcidObject"]["GC_MIN"]);
-      obj["GCFilterMax"] = Math.min(GCFilterMax,obj["AminoAcidObject"]["GC_MAX"]);
+    if ("aminoAcid" in obj) {
+      let {gcFilterMin,gcFilterMax} = this.state;
+      obj["gcFilterMin"] = Math.max(gcFilterMin,obj["aminoAcid"]["GC_MIN"]);
+      obj["gcFilterMax"] = Math.min(gcFilterMax,obj["aminoAcid"]["GC_MAX"]);
     }
     super.setState(obj);
   }
